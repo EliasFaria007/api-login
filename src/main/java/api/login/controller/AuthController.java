@@ -1,52 +1,58 @@
 package api.login.controller;
 
+import api.login.domain.User;
 import api.login.dto.LoginRequestDTO;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.http.ResponseEntity;
+import api.login.dto.LoginResponseDTO;
+import api.login.dto.RegisterRequest;
+import api.login.dto.RegisterResponse;
+import api.login.security.JwtUtil;
+import api.login.service.AuthService;
+import api.login.service.UserService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
+@RequiredArgsConstructor
 public class AuthController {
 
+    private final UserService userService;
     private final AuthenticationManager authenticationManager;
+    private final JwtUtil jwtUtil;
 
-    public AuthController(AuthenticationManager authenticationManager) {
-        this.authenticationManager = authenticationManager;
+    @PostMapping("/register")
+    public RegisterResponse register(@RequestBody RegisterRequest request) {
+
+        User user = new User();
+        user.setUsername(request.getUsername());
+        user.setPassword(request.getPassword());
+        user.setRole(request.getRole());
+
+        User saved = userService.create(user);
+
+        return RegisterResponse.builder()
+                .id(saved.getId())
+                .username(saved.getUsername())
+                .role(saved.getRole().name())
+                .build();
     }
+
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequestDTO dto) {
+    public String login(@RequestBody User user) {
 
         Authentication authentication =
-                new UsernamePasswordAuthenticationToken(
-                        dto.getUsername(),
-                        dto.getPassword()
+                authenticationManager.authenticate(
+                        new UsernamePasswordAuthenticationToken(
+                                user.getUsername(),
+                                user.getPassword()
+                        )
                 );
 
-        authenticationManager.authenticate(authentication);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        return ResponseEntity.ok(authentication.getName());
-    }
-
-    @GetMapping("/me")
-    public ResponseEntity<?> me(Authentication authentication) {
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return ResponseEntity.status(401).build();
-        }
-        return ResponseEntity.ok(authentication.getName());
-    }
-
-    @PostMapping("/logout")
-    public ResponseEntity<?> logout(HttpServletRequest request) throws ServletException {
-        request.logout();
-        SecurityContextHolder.clearContext();//remove usuario da sessão
-        return ResponseEntity.ok("logout realizado com sucesso");
+        return jwtUtil.generateToken(authentication.getName());
     }
 }

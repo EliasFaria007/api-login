@@ -1,14 +1,12 @@
 package api.login.dto;
 
+import api.login.domain.Role;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
-@Setter
-@AllArgsConstructor
-public class UserResponseDTO {
-    private Long id;
-    private String username;
-    private String role;
-}
+public record UserResponseDTO(
+        Long id,
+        String username,
+        Role role
+) {}

@@ -13,7 +13,12 @@ public class UserService {
     private final UserRepository repository;
     private final PasswordEncoder passwordEncoder;
 
-    public User save(User user) {
+    public User create(User user) {
+
+        if (repository.existsByUsername(user.getUsername())) {
+            throw new RuntimeException("Username já existe");
+        }
+
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return repository.save(user);
     }

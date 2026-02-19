@@ -1,11 +1,12 @@
 package api.login.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
-@Setter
-public class LoginRequestDTO {
-    private String username;
-    private String password;
-}
+public record LoginRequestDTO(
+        @NotBlank
+        String username,
+        @NotBlank
+        String password
+) {}

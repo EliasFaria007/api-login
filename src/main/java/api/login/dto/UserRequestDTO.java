@@ -1,12 +1,17 @@
 package api.login.dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import api.login.domain.Role;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
-@Getter
-@Setter
-public class UserRequestDTO {
-    private String username;
-    private String password;
-    private String role;
-}
+public record UserRequestDTO(
+
+        @NotBlank
+        String username,
+
+        @NotBlank
+        String password,
+
+        @NotNull
+        Role role
+) {}
