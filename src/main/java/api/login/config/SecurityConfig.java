@@ -29,6 +29,7 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtFilter;
 
+
     @Bean
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration config) throws Exception {
