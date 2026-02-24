@@ -1,6 +1,7 @@
 package api.login.service;
 
 import api.login.domain.User;
+import api.login.exception.BusinessException;
 import api.login.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,7 +17,7 @@ public class UserService {
     public User create(User user) {
 
         if (repository.existsByUsername(user.getUsername())) {
-            throw new RuntimeException("Username já existe");
+            throw new BusinessException("Username já existe");
         }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));

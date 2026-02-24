@@ -6,9 +6,7 @@ import api.login.dto.LoginResponseDTO;
 import api.login.dto.RegisterRequest;
 import api.login.dto.RegisterResponse;
 import api.login.security.JwtUtil;
-import api.login.service.AuthService;
 import api.login.service.UserService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -43,16 +41,18 @@ public class AuthController {
 
 
     @PostMapping("/login")
-    public String login(@RequestBody User user) {
+    public LoginResponseDTO login(@RequestBody LoginRequestDTO request) {
 
         Authentication authentication =
                 authenticationManager.authenticate(
                         new UsernamePasswordAuthenticationToken(
-                                user.getUsername(),
-                                user.getPassword()
+                                request.username(),
+                                request.password()
                         )
                 );
 
-        return jwtUtil.generateToken(authentication.getName());
+        String token = jwtUtil.generateToken(authentication.getName());
+
+        return new LoginResponseDTO(token);
     }
 }
